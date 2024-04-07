@@ -12,11 +12,4 @@
 #include <string.h>
 #include <sys/wait.h>
 
-typedef struct Progam
-{
-    int argc;
-    char**argv;
-} Progam;
-
-
 #endif
