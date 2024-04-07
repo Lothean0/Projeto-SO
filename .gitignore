@@ -1,0 +1,9 @@
+*
+!*.*
+!*/
+!Makefile
+*.out
+*.o
+*.txt
+output/
+!README
