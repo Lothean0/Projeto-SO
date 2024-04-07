@@ -5,19 +5,20 @@ int main()
 {
     char *fifopath = "fifos/fifo";
     mkfifo(fifopath, 0666);
+    int argc;
     ssize_t bytes_read;
-    Progam *args=malloc(sizeof(Progam));
-    while (1)
+    while(1)
     {
         int fd = open(fifopath, O_RDONLY);
-        //problema em passar array
-        while ((bytes_read = read(fd, args, sizeof(Progam))) > 0)
-        {
-            for (int i = 0; i < args->argc-1; i++)
+        read(fd, &argc, sizeof(int));
+        printf("argc: %d\n",argc);
+        char *argv[argc-1];
+        for (int j=0;(bytes_read = read(fd,argv[j], sizeof(char*))) > 0;j++);
+        for (int i = 0; i < argc-1; i++)
             {
-                write(0,args->argv[i],sizeof(char));
+                printf("argv[%d]: %s\n",i,argv[i]);
+                //write(0,argv[i],sizeof(argv[i]));
             }
-        }
         close(fd);
     }
     return 0;
