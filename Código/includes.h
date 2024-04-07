@@ -1,6 +1,8 @@
 #if !defined(INCLUDES)
 #define INCLUDES
 
+#define MAX_LINE_LENGTH 1024
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -10,4 +12,11 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#endif // INCLUDES
+typedef struct Progam
+{
+    int argc;
+    char**argv;
+} Progam;
+
+
+#endif

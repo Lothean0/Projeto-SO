@@ -3,15 +3,12 @@ CFLAGS = -Wall -g
 
 all: client server
 
-client: client.o
+client: client.o 
+	$(CC) $(CFLAGS) -o  $@ $^ $(LIBS)
 
-server: server.o
-
-client.o: client.c
-
-server.o: server.c
+server: server.o mysystem.o
+	$(CC) $(CFLAGS) -o  $@ $^ $(LIBS)
 
 clean:
-	rm -f *.o client server
+	rm -f *.o client server mysystem
 	rm -f fifos/*
-	
