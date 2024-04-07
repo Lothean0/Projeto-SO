@@ -3,22 +3,16 @@
 int main(int argc, char *argv[])
 {
     char *fifopath = "fifos/fifo";
-    Progam *args=malloc(sizeof(Progam));
-    args->argv=malloc(sizeof(*args->argv)*argc);
-	int N = 0;
-	for(int i=1; i < argc; i++){
-		args->argv[N] = strdup(argv[i]);
-		N++;
-	}
-    args->argc=argc;
-    printf("argc: %d\n",args->argc);
-    for (int i = 0; i < argc-1; i++)
-    {
-        printf("arg[%d]: %s\n",i,args->argv[i]);
-    }
+    char *args[argc-1];
     
     int fd = open(fifopath, O_WRONLY);
-    write(fd,args,sizeof(Progam)+sizeof(*args->argv)*argc);
+    write(fd,&argc,sizeof(int));
+	for(int i=0; i < argc-1; i++){
+		args[i] = strdup(argv[i+1]);
+        char* pointer=args[i];
+        write(fd,pointer,sizeof(char*));
+        printf("arg[%d]: %s\n",i,pointer);
+	}
     close(fd);
     return 0;
 }
