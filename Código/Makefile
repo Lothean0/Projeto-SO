@@ -12,4 +12,4 @@ client.o: client.c
 server.o: server.c
 
 clean:
-	rm -f *.o all
+	rm -f *.o client server

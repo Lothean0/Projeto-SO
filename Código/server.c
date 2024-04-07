@@ -3,7 +3,7 @@
 
 int main(){
     int fd;
-    char * fifopath="fifos";
-    int fifo=mkfifo("fifos", 0666);
+    char * fifopath="fifo";
+    int fifo=mkfifo("fifo", 0666);
     return fifo;
 }
