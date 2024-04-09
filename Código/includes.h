@@ -12,4 +12,11 @@
 #include <string.h>
 #include <sys/wait.h>
 
+typedef struct Progam
+{
+int argc;
+char mode[2][8]; //execute or status e -u ou -p
+int time;
+char command[300];
+}Progam;
 #endif
