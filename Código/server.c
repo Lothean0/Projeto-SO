@@ -1,30 +1,29 @@
 #include "includes.h"
 #include "mysystem.h"
-/*
+
 int main()
 {
     char *fifopath = "fifos/fifo";
     mkfifo(fifopath, 0666);
-    int argc;
     ssize_t bytes_read;
     while(1)
     {
+        Progam *args=malloc(sizeof(Progam));
         int fd = open(fifopath, O_RDONLY);
-        read(fd, &argc, sizeof(int));
-        printf("argc: %d\n",argc);
-        char *argv[argc-1];
-        for (int j=0;(bytes_read = read(fd,argv[j], sizeof(char*))) > 0;j++);
-        for (int i = 0; i < argc-1; i++)
-            {
-                printf("argv[%d]: %s\n",i,argv[i]);
-                //write(0,argv[i],sizeof(argv[i]));
-            }
+        
+        while((bytes_read = read(fd,args, sizeof(Progam))) > 0);
+        printf("argc: %d\n",args->argc);
+        printf("mode[0]: %s\n",args->mode[0]);
+        printf("mode[1]: %s\n",args->mode[1]);
+        printf("time: %d\n",args->time);
+        printf("args: %s\n",args->command);
+        mysystem(args->command);
         close(fd);
     }
     return 0;
 }
-*/
 
+/*
 int main()
 {
     char *fifopath = "fifos/fifo";
@@ -83,3 +82,4 @@ int main()
     }
     return 0;
 }
+*/
