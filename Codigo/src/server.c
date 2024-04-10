@@ -3,22 +3,40 @@
 
 int main()
 {
-    char *fifopath = "fifos/fifo";
+    char *fifopath = "../tmp/fifo";
     mkfifo(fifopath, 0666);
     ssize_t bytes_read;
-    while(1)
+    int taskid = 1;
+    while (1)
     {
-        Progam *args=malloc(sizeof(Progam));
+        Progam *args = malloc(sizeof(Progam));
         int fd = open(fifopath, O_RDONLY);
-        
-        while((bytes_read = read(fd,args, sizeof(Progam))) > 0);
-        printf("argc: %d\n",args->argc);
-        printf("mode[0]: %s\n",args->mode[0]);
-        printf("mode[1]: %s\n",args->mode[1]);
-        printf("time: %d\n",args->time);
-        printf("args: %s\n",args->command);
-        mysystem(args->command);
+
+        while ((bytes_read = read(fd, args, sizeof(Progam))) > 0);
+
+        if (strcmp(args->mode[0], "execute")== 0)
+        {
+            char response_fifo[256];
+            sprintf(response_fifo, "../tmp/response_fifo_%d",args->pid);
+            int fd_response=open(response_fifo, O_WRONLY);
+            write(fd_response, &taskid, sizeof(int));
+            close(fd_response);
+            printf("taskid: %d\n", taskid);
+            printf("pid: %d\n", args->pid);
+            printf("argc: %d\n", args->argc);
+            printf("mode[0]: %s\n", args->mode[0]);
+            printf("mode[1]: %s\n", args->mode[1]);
+            printf("time: %d\n", args->time);
+            printf("args: %s\n", args->command);
+            mysystem(args->command);
+            taskid++;
+        }
+        else if (strcmp(args->mode[0], "status") == 0)
+        {
+            printf("mode[0]: %s\n", args->mode[0]);
+        }
         close(fd);
+        free(args);
     }
     return 0;
 }
