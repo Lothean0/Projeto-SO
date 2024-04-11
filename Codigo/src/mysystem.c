@@ -3,6 +3,8 @@
 // recebe um comando por argumento
 // retorna -1 se o fork falhar
 // caso contrario retorna o valor do comando executado
+
+//esta é a certa
 int mysystem (const char* command) {
 
 	int res = -1;
@@ -35,3 +37,4 @@ int mysystem (const char* command) {
 
 	return res;
 }
+

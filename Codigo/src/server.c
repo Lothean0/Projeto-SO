@@ -1,6 +1,6 @@
 #include "includes.h"
 #include "mysystem.h"
-
+/* esta é a certa
 int main()
 {
     char *fifopath = "../tmp/fifo";
@@ -40,7 +40,7 @@ int main()
     }
     return 0;
 }
-
+*/
 /*
 int main()
 {
@@ -101,3 +101,115 @@ int main()
     return 0;
 }
 */
+
+//segunda certa
+// #include "includes.h"
+// #include "mysystem.h"
+
+// int main()
+// {
+//     char *fifopath = "../tmp/fifo";
+//     mkfifo(fifopath, 0666);
+//     ssize_t bytes_read;
+//     int taskid = 1;
+//     while (1)
+//     {
+//         Progam *args = malloc(sizeof(Progam));
+//         int fd = open(fifopath, O_RDONLY);
+
+//         while ((bytes_read = read(fd, args, sizeof(Progam))) > 0);
+
+//         if (strcmp(args->mode[0], "execute")== 0)
+//         {
+//             char response_fifo[256];
+//             sprintf(response_fifo, "../tmp/response_fifo_%d.txt", args->pid); // Change to use .txt extension
+//             int fd_response=open(response_fifo, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+//             // Print the desired output
+//             printf("argc: %d\n", args->argc);
+//             printf("mode[0]: %s\n", args->mode[0]);
+//             printf("mode[1]: %s\n", args->mode[1]);
+//             printf("time: %d\n", args->time); // Assuming 'time' field represents 'team'
+//             printf("args: %s\n", args->command);
+//             printf("Task_id: %d\n", taskid); // Print Task_id
+//             printf("pid: %d\n", args->pid); // Print pid
+
+//             // Redirect stdout to the response file
+//             dup2(fd_response, STDOUT_FILENO);
+//             close(fd_response); // Close the file descriptor, since stdout is now redirected
+
+//             // Execute the command and redirect output to response file
+//             mysystem(args->command);
+
+//             // Restore stdout
+//             dup2(STDOUT_FILENO, STDOUT_FILENO);
+            
+//             printf("Task output written to %s\n", response_fifo); // Print a message
+            
+//             taskid++;
+//         }
+//         else if (strcmp(args->mode[0], "status") == 0)
+//         {
+//             printf("mode[0]: %s\n", args->mode[0]);
+//         }
+//         close(fd);
+//         free(args);
+//     }
+//     return 0;
+// }
+
+#include "includes.h"
+#include "mysystem.h"
+
+int main()
+{
+    char *fifopath = "../tmp/fifo";
+    mkfifo(fifopath, 0666);
+    ssize_t bytes_read;
+    int taskid = 1;
+    while (1)
+    {
+        Progam *args = malloc(sizeof(Progam));
+        int fd = open(fifopath, O_RDONLY);
+
+        while ((bytes_read = read(fd, args, sizeof(Progam))) > 0);
+
+        if (strcmp(args->mode[0], "execute")== 0)
+        {
+            char response_fifo[256];
+            sprintf(response_fifo, "../tmp/response_fifo_%d.txt", args->pid); 
+            int fd_response=open(response_fifo, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+            // Print the desired output
+            printf("argc: %d\n", args->argc);
+            printf("mode[0]: %s\n", args->mode[0]);
+            printf("mode[1]: %s\n", args->mode[1]);
+            printf("time: %d\n", args->time);
+            printf("args: %s\n", args->command);
+            printf("Task_id: %d\n", taskid); // Print Task_id
+            printf("pid: %d\n", args->pid); // Print PID
+            printf("Task output written to %s\n", response_fifo);
+
+            // Redirect stdout to the response file
+            dup2(fd_response, STDOUT_FILENO);
+            close(fd_response); // Close the file descriptor, since stdout is now redirected
+
+            // Execute the command and redirect output to response file
+            mysystem(args->command);
+
+            // Restore stdout
+            dup2(STDOUT_FILENO, STDOUT_FILENO);
+            
+            // Increment the taskid after executing a task
+            taskid++;
+        }
+        else if (strcmp(args->mode[0], "status") == 0)
+        {
+            printf("mode[0]: %s\n", args->mode[0]);
+        }
+        close(fd);
+        free(args);
+    }
+    return 0;
+}
+
