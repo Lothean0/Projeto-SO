@@ -27,11 +27,11 @@ int mysystem (const char* command) {
 	gettimeofday(&comeco,NULL);
 	
 	if ((pid=fork())==0)
-    {
+    	{
         int res = execvp(exec_args[0],exec_args);
         if (res==-1)perror("No such file");
         _exit(res);
-    }
+    	}
 	else
 	{
 		wait(&res);
