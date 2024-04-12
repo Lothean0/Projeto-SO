@@ -7,7 +7,9 @@ int mysystem (const char* command, int taskid) {
 
 	int res = -1;
 	pid_t pid;
-
+	char output_file[256];
+	sprintf(output_file, "../tmp/output_task_id_%d.txt", taskid);
+	int fd=open(output_file, O_WRONLY | O_CREAT , 0666);
 	// Estamos a assumir numero maximo de argumentos
 	// isto teria de ser melhorado com realloc por exemplo
 	char *exec_args[20];
