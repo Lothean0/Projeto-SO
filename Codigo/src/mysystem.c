@@ -10,6 +10,9 @@ int mysystem (const char* command, int taskid) {
 	char output_file[256];
 	sprintf(output_file, "../tmp/output_task_id_%d.txt", taskid);
 	int fd=open(output_file, O_WRONLY | O_CREAT , 0666);
+	dup2(fd,STDOUT_FILENO);
+	close(fd);
+	dup2(fd,STDERR_FILENO);
 	// Estamos a assumir numero maximo de argumentos
 	// isto teria de ser melhorado com realloc por exemplo
 	char *exec_args[20];
@@ -36,6 +39,7 @@ int mysystem (const char* command, int taskid) {
     	}
 	else
 	{
+		dup2(STDOUT_FILENO, STDOUT_FILENO);
 		wait(&res);
 		res = WEXITSTATUS(res);
 	}
