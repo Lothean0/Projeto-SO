@@ -20,15 +20,12 @@ int gettimeofday(struct tempo *restrict tp, void *restrict tzp);
 typedef struct Progam
 {
 pid_t pid;
+int taskid;
 int argc;
 char mode[2][8]; //execute or status e -u ou -p
 int time;
 char command[300];
+long tempo_exec;
 }Progam;
-
-typedef struct Task	{	
-	int taskid;
-	char command[300];
-}Task;
 
 #endif

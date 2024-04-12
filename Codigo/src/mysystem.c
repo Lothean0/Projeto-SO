@@ -10,7 +10,6 @@ long mysystem(const char *command, int taskid, char *output_folder)
 	pid_t pid;
 	char output_file[256];
 	sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, taskid);
-	printf("output_folder: %s\n", output_folder);
 	int fd = open(output_file, O_WRONLY | O_CREAT, 0666);
 	dup2(fd, STDOUT_FILENO);
 	close(fd);

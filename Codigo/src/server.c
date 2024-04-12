@@ -1,82 +1,72 @@
 #include "includes.h"
 #include "mysystem.h"
-#include <math.h>
 
 int main(int argc, char *argv[])
 {
+    if (argc < 3)
+    {
+        return -1;
+    }
+
     char output_file_full[256];
     sprintf(output_file_full, "../%s/output_full.txt", argv[1]);
     char *fifopath = "../tmp/fifo";
     mkfifo(fifopath, 0666);
-    ssize_t bytes_read;
-    Task *task = malloc(sizeof(Task));
-    task->taskid = 1;
-    while (1)
+    int taskid = 1;
+    int quit = 0;
+    int fd_temp;
+    int fd = open(fifopath, O_RDONLY);
+    while (quit == 0)
     {
         Progam *args = malloc(sizeof(Progam));
-        int fd = open(fifopath, O_RDONLY);
-
-        while ((bytes_read = read(fd, args, sizeof(Progam))) > 0)
-            ;
-
-        if (strcmp(args->mode[0], "execute") == 0)
+        while ((read(fd, args, sizeof(Progam))) > 0)
         {
-            int fd_pipe[2], fd_pipe2[2];
-            pipe(fd_pipe);
-            pipe(fd_pipe2);
-            if (fork() == 0)
+
+            if (strcmp(args->mode[0], "execute") == 0)
             {
-                strcpy(task->command, args->command);
+                args->taskid = taskid++;
                 char response_fifo[256];
                 sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
-                write(fd_response, &task->taskid, sizeof(int));
+                write(fd_response, &args->taskid, sizeof(int));
                 close(fd_response);
-                close(fd_pipe[0]);
-                write(fd_pipe[1], task, sizeof(Task));
-                exit(0);
-            }
-            for (int i = 0; i < atoi(argv[2]); i++)
-            {
                 if (fork() == 0)
                 {
-                    close(fd_pipe[1]);
-                    read(fd_pipe[0], task, sizeof(Task));
-                    long tempo_exec = mysystem(task->command, task->taskid, argv[1]);
-                    int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
-                    char *taskid_char = malloc(sizeof(char) * floor(log10(task->taskid)) + 8);
-                    char *tempo_exec_char = malloc(sizeof(char) * floor(log10(tempo_exec)) + 19);
-                    sprintf(taskid_char, "Taskid: %d", task->taskid);
-                    sprintf(tempo_exec_char, "Tempo execução: %ld", tempo_exec);
-                    lseek(fd_out, 0, SEEK_END);
-                    write(fd_out, taskid_char, floor(log10(task->taskid) + 9));
-                    write(fd_out, "\n", sizeof(char));
-                    write(fd_out, tempo_exec_char, floor(log10(tempo_exec) + 19));
-                    write(fd_out, "\n", sizeof(char));
-                    write(fd_out, "\n", sizeof(char));
-                    close(fd_pipe[0]);
-                    close(fd_out);
+                    long tempo_exec = mysystem(args->command, args->taskid, argv[1]);
+                    args->pid = getpid();
+                    strcpy(args->mode[0], "fork");
+                    args->tempo_exec = tempo_exec;
+                    fd_temp = open(fifopath, O_WRONLY);
+                    write(fd_temp, args, sizeof(Progam));
+                    close(fd_temp);
+                    exit(0);
                 }
             }
-            close(fd_pipe[1]);
-                    task->taskid++;
-            // printf("pid: %d\n", args->pid);
-            // printf("argc: %d\n", args->argc);
-            // printf("mode[0]: %s\n", args->mode[0]);
-            // printf("mode[1]: %s\n", args->mode[1]);
-            // printf("time: %d\n", args->time);
-            // printf("args: %s\n", args->command);
+            else if (strcmp(args->mode[0], "status") == 0)
+            {
+                printf("mode[0]: %s\n", args->mode[0]);
+            }
+            else if (strcmp(args->mode[0], "fork") == 0)
+            {
+                waitpid(args->pid, NULL, 0);
+                char buffer[500];
+                sprintf(buffer, "Taskid: %d\nProgama:%s\nTempo execução: %ld\n\n", args->taskid, args->command, args->tempo_exec);
+                int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
+                lseek(fd_out, 0, SEEK_END);
+                write(fd_out, buffer, strlen(buffer));
+                close(fd_out);
+            }
+            else if (strcmp(args->mode[0], "quit") == 0)
+            {
+                quit = 1;
+            }
         }
-        else if (strcmp(args->mode[0], "status") == 0)
-        {
-            printf("mode[0]: %s\n", args->mode[0]);
-        }
-        close(fd);
         free(args);
     }
+    close(fd); // Moved outside of the while loop
+    unlink(fifopath);
     return 0;
 }
-
 /*
 int main()
 {
