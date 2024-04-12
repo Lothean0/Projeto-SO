@@ -20,6 +20,12 @@ int mysystem (const char* command) {
 	}
 	exec_args[i]=NULL;
 
+	
+	struct tempo comeco,fim;
+	long segundos, microseg;
+
+	gettimeofday(&comeco,NULL);
+	
 	if ((pid=fork())==0)
     {
         int res = execvp(exec_args[0],exec_args);
@@ -31,6 +37,12 @@ int mysystem (const char* command) {
 		wait(&res);
 		res = WEXITSTATUS(res);
 	}
+	segundos = fim.segundos - comeco.segundos;
+	microseg = fim.microseg - comeco.microseg;
+	long tempoTotal = (segundos * 1000) + (microseg/1000); // convertendo pra milisegundos
+	printf("tempo de execucao: %ld milisegundos\n",tempoTotal); // print aqui so pra debug, dps tirar
+	
+	
 	free(tofree);
 
 	return res;
