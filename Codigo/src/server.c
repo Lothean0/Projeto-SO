@@ -7,6 +7,7 @@ int main()
     mkfifo(fifopath, 0666);
     ssize_t bytes_read;
     Task *task = malloc(sizeof(Task));
+    task->taskid = 1;
     while (1)
     {
         Progam *args = malloc(sizeof(Progam));
@@ -16,12 +17,13 @@ int main()
 
         if (strcmp(args->mode[0], "execute")== 0)
         {
+            strcpy(task->command, args->command);
             char response_fifo[256];
             sprintf(response_fifo, "../tmp/response_fifo_%d",args->pid);
             int fd_response=open(response_fifo, O_WRONLY);
             write(fd_response, &task->taskid, sizeof(int));
             close(fd_response);
-            strcpy(task->command, args->command);
+            
             
             // printf("pid: %d\n", args->pid);
             // printf("argc: %d\n", args->argc);
