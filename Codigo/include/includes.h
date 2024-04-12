@@ -25,4 +25,10 @@ char mode[2][8]; //execute or status e -u ou -p
 int time;
 char command[300];
 }Progam;
+
+typedef struct Task	{	
+	int taskid;
+	char command[300];
+}Task;
+
 #endif

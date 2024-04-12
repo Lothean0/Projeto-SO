@@ -3,7 +3,7 @@
 // recebe um comando por argumento
 // retorna -1 se o fork falhar
 // caso contrario retorna o valor do comando executado
-int mysystem (const char* command) {
+int mysystem (const char* command, int taskid) {
 
 	int res = -1;
 	pid_t pid;
@@ -48,3 +48,8 @@ int mysystem (const char* command) {
 
 	return res;
 }
+
+
+//redirecionar aqui o ficheiro
+//mudar a mysystem para receber a taskid
+//sprintf(response_fifo, "../tmp/task_id_%d",&taskid);
