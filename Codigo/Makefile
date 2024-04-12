@@ -1,16 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -g -Iinclude
-LDFLAGS =
+LDFLAGS = -lm
 all: folders server client
 server: bin/server
 client: bin/client
 folders:
-	@mkdir -p src include obj bin tmp
-bin/server: obj/server.o obj/mysystem.o
+	@mkdir -p src include obj bin tmp output
+bin/server: obj/server.o obj/mysystem.o 
 	$(CC) $(LDFLAGS) $^ -o $@
 bin/client: obj/client.o
 	$(CC) $(LDFLAGS) $^ -o $@
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 clean:
-	rm -f obj/* tmp/* bin/*
+	rm -f obj/* tmp/* bin/* output/*

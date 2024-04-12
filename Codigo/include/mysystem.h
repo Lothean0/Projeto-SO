@@ -1,7 +1,7 @@
 #if !defined(MYSYSTEM)
 #define MYSYSTEM
 
-int mysystem (const char* command, int taskid);
+long mysystem (const char* command, int taskid, char* output_folder);
 
 #endif // MYSYSTEM
 
