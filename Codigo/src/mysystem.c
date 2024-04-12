@@ -37,6 +37,7 @@ int mysystem (const char* command) {
 		wait(&res);
 		res = WEXITSTATUS(res);
 	}
+	gettimeofday(&fim,NULL);
 	segundos = fim.segundos - comeco.segundos;
 	microseg = fim.microseg - comeco.microseg;
 	long tempoTotal = (segundos * 1000) + (microseg/1000); // convertendo pra milisegundos
