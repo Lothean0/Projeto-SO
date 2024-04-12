@@ -12,6 +12,11 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <time.h>
+struct tempo{
+	long segundos;
+	long microseg;
+};
+int gettimeofday(struct tempo *restrict tp, void *restrict tzp);
 typedef struct Progam
 {
 pid_t pid;
