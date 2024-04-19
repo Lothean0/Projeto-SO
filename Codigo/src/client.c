@@ -2,8 +2,8 @@
 
 int main(int argc, char *argv[])
 {
-    int taskid;
-    char response_fifo[256];
+    int taskid; 
+    char response_fifo[256]; 
     pid_t pid = getpid();
     sprintf(response_fifo, "../tmp/response_fifo_%d", pid);
     if (mkfifo(response_fifo, 0666) == -1)
@@ -38,11 +38,11 @@ int main(int argc, char *argv[])
             strcat(args->command, " ");
             strcat(args->command, argv[i]);
         }
-        printf("argc: %d\n", args->argc);
-        printf("mode[0]: %s\n", args->mode[0]);
-        printf("mode[1]: %s\n", args->mode[1]);
-        printf("time: %d\n", args->time);
-        printf("args: %s\n", args->command);
+        // printf("argc: %d\n", args->argc);
+        // printf("mode[0]: %s\n", args->mode[0]);
+        // printf("mode[1]: %s\n", args->mode[1]);
+        // printf("time: %d\n", args->time);
+        // printf("args: %s\n", args->command);
 
         write(fd, args, sizeof(Progam));
         close(fd);
@@ -105,32 +105,3 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-
-/*
-int main(int argc, char *argv[]) {
-    char *fifopath = "fifos/fifo";
-
-    // Open FIFO for writing
-    int fd = open(fifopath, O_WRONLY);
-    if (fd == -1) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
-
-
-    int argc_to_write = argc - 1; // Exclude program name
-    write(fd, &argc_to_write, sizeof(int));
-
-    // Write each argument starting from argv[1]
-    for (int i = 1; i < argc; i++) {
-        size_t arg_len = strlen(argv[i]) + 1; // Include null terminator
-        write(fd, &arg_len, sizeof(size_t));
-        write(fd, argv[i], arg_len);
-    }
-
-    // Close FIFO
-    close(fd);
-
-    return 0;
-}
-*/

@@ -1,6 +1,7 @@
 #if !defined(INCLUDES)
 #define INCLUDES
 
+#define MAX__PARALLEL_TASKS 1000
 #define MAX_LINE_LENGTH 1024
 
 #include <stdlib.h>
@@ -28,4 +29,9 @@ char command[300];
 long tempo_exec;
 }Progam;
 
+typedef struct FCFS_Task {
+    Progam task;
+    struct FCFS_Task *next;
+} FCFS_Task;
 #endif
+

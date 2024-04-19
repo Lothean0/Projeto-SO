@@ -53,6 +53,7 @@ long mysystem(const char *command, int taskid, char *output_folder)
 	return tempoTotal;
 }
 
+
 // redirecionar aqui o ficheiro
 // mudar a mysystem para receber a taskid
 // sprintf(response_fifo, "../tmp/task_id_%d",&taskid);
