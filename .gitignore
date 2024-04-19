@@ -1,6 +1,7 @@
 *
 !*.*
 !*/
+!.sh
 !Makefile
 *.out
 *.o
