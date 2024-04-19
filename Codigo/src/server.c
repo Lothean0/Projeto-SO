@@ -79,59 +79,67 @@ int main(int argc, char *argv[])
 
     char output_file_full[256];
     sprintf(output_file_full, "../%s/output_full.txt", argv[1]);
-    char *fifopath = "../tmp/fifo";
+    char fifopath[18] = "../tmp/fifo";
     mkfifo(fifopath, 0666);
     int taskid = 1;
     int fd = open(fifopath, O_RDONLY);
+    int fd_write = open(fifopath, O_WRONLY);
     char *sched_policy = argv[3];
     int max_parallel_tasks = atoi(argv[2]);
     int running_tasks = 0;
+    int quit = 0;
 
     FCFS_Task *fcfs_queue = NULL;
 
-    while (1)
-    { // Infinite loop until termination command received
-        if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
-        {
-            Progam task = dequeue(&fcfs_queue);
-            if (fork() == 0)
-            {
-                task.pid = getpid();
-                task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
-                strcpy(task.mode[0], "fork");
-                int fd_temp = open(fifopath, O_WRONLY);
-                write(fd_temp, &task, sizeof(Progam));
-                close(fd_temp);
-                exit(0);
-            }
-            else
-            {
-                running_tasks++;
-            }
-        }
-        Progam *args = malloc(sizeof(Progam));
-        if (read(fd, args, sizeof(Progam)) <= 0)
-        {
-            free(args);
-            continue;
-        }
+    Progam *args = malloc(sizeof(Progam));
+    while (read(fd, args, sizeof(Progam)) > 0)
+    {
 
         if (strcmp(args->mode[0], "execute") == 0)
         {
-            args->taskid = taskid++;
-            if (strcmp(sched_policy, "SJF") == 0)
+            if (!quit)
             {
-                enqueue_sjf(&fcfs_queue, *args);
+                args->taskid = taskid++;
+                if (strcmp(sched_policy, "SJF") == 0)
+                {
+                    enqueue_sjf(&fcfs_queue, *args);
+                }
+                else
+                {
+                    enqueue(&fcfs_queue, *args);
+                }
+                char response_fifo[256];
+                sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
+                int fd_response = open(response_fifo, O_WRONLY);
+                write(fd_response, &args->taskid, sizeof(int));
+                close(fd_response);
+                if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
+                {
+                    Progam task = dequeue(&fcfs_queue);
+                    if (fork() == 0)
+                    {
+                        task.pid = getpid();
+                        task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                        strcpy(task.mode[0], "fork");
+                        write(fd_write, &task, sizeof(Progam));
+                        close(fd_write);
+                        exit(0);
+                    }
+                    else
+                    {
+                        running_tasks++;
+                    }
+                }
             }
             else
             {
-                enqueue(&fcfs_queue, *args);
+                char response_fifo[256];
+                sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
+                int fd_response = open(response_fifo, O_WRONLY);
+                int res = -1;
+                write(fd_response, &res, sizeof(int));
+                close(fd_response);
             }
-            char response_fifo[256];
-            sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
-            int fd_response = open(response_fifo, O_WRONLY);
-            write(fd_response, &args->taskid, sizeof(int));
-            close(fd_response);
         }
         else if (strcmp(args->mode[0], "fork") == 0)
         {
@@ -143,15 +151,35 @@ int main(int argc, char *argv[])
             write(fd_out, buffer, strlen(buffer));
             close(fd_out);
             running_tasks--;
+            if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
+            {
+                Progam task = dequeue(&fcfs_queue);
+                if (fork() == 0)
+                {
+                    task.pid = getpid();
+                    task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                    strcpy(task.mode[0], "fork");
+                    write(fd_write, &task, sizeof(Progam));
+                    close(fd_write);
+                    exit(0);
+                }
+                else
+                {
+                    running_tasks++;
+                }
+            }
         }
         else if (strcmp(args->mode[0], "quit") == 0)
         {
-            break; // Termination command received, exit the loop
+            quit = 1;
         }
-
-        free(args);
+        if (quit == 1 && running_tasks == 0 && fcfs_queue == NULL)
+        {
+            free(args);
+            close(fd_write);
+            close(fd);
+            unlink(fifopath);
+            return 0;
+        }
     }
-    close(fd);
-    unlink(fifopath);
-    return 0;
 }
