@@ -103,5 +103,6 @@ int main(int argc, char *argv[])
         close(fd);
         free(args);
     }
+    unlink(response_fifo);
     return 0;
 }
