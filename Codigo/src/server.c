@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
             if (fork() == 0)
             {
                 task.pid = getpid();
-                task.tempo_exec= mysystem(task.command, task.taskid, argv[1]);
+                task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
                 strcpy(task.mode[0], "fork");
                 int fd_temp = open(fifopath, O_WRONLY);
                 write(fd_temp, &task, sizeof(Progam));
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
         Progam *args = malloc(sizeof(Progam));
         if (read(fd, args, sizeof(Progam)) <= 0)
         {
-            //free(args);
+            free(args);
             continue;
         }
 
@@ -127,11 +127,11 @@ int main(int argc, char *argv[])
             {
                 enqueue(&fcfs_queue, *args);
             }
-                char response_fifo[256];
-                sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
-                int fd_response = open(response_fifo, O_WRONLY);
-                write(fd_response, &args->taskid, sizeof(int));
-                close(fd_response);
+            char response_fifo[256];
+            sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
+            int fd_response = open(response_fifo, O_WRONLY);
+            write(fd_response, &args->taskid, sizeof(int));
+            close(fd_response);
         }
         else if (strcmp(args->mode[0], "fork") == 0)
         {
@@ -151,7 +151,6 @@ int main(int argc, char *argv[])
 
         free(args);
     }
-    free(fcfs_queue);
     close(fd);
     unlink(fifopath);
     return 0;
