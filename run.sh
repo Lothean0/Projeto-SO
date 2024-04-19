@@ -1,3 +1,8 @@
+#!/bin/bash
+
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+
+cd "$parent_path"
 
 if [ "$#" -ne 1 ]; then
 	echo "Erro nos argumentos"
@@ -12,7 +17,7 @@ if [ ! -f "$ficheiro" ]; then
 fi
 
 mapfile -t scripts < "$ficheiro"
-
+cd "$parent_path/Codigo/bin"
 for scrpt in "${scripts[@]}"; do
 	eval "$scrpt" &
 	wait
