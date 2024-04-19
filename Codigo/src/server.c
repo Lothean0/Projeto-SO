@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(args->mode[0], "fork") == 0)
         {
-            waitpid(args->pid, NULL, WNOHANG);
+            waitpid(args->pid, NULL, 0);
             char buffer[500];
             sprintf(buffer, "Taskid: %d\nProgama:%s\nTempo execução: %ld\n\n", args->taskid, args->command, args->tempo_exec);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
