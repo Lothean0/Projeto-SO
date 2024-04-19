@@ -109,7 +109,6 @@ int main(int argc, char *argv[])
                 running_tasks++;
             }
         }
-        printf("aa");
         Progam *args = malloc(sizeof(Progam));
         if (read(fd, args, sizeof(Progam)) <= 0)
         {
