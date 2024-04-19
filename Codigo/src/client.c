@@ -2,8 +2,8 @@
 
 int main(int argc, char *argv[])
 {
-    int taskid; 
-    char response_fifo[256]; 
+    int taskid;
+    char response_fifo[256];
     pid_t pid = getpid();
     sprintf(response_fifo, "../tmp/response_fifo_%d", pid);
     if (mkfifo(response_fifo, 0666) == -1)
