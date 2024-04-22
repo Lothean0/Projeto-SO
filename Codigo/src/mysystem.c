@@ -1,8 +1,8 @@
 #include "includes.h"
 
-// recebe um comando por argumento
-// retorna -1 se o fork falhar
-// caso contrario retorna o valor do comando executado
+// // recebe um comando por argumento
+// // retorna -1 se o fork falhar
+// // caso contrario retorna o valor do comando executado
 long mysystem(const char *command, int taskid, char *output_folder)
 {
 
@@ -54,6 +54,7 @@ long mysystem(const char *command, int taskid, char *output_folder)
 }
 
 
-// redirecionar aqui o ficheiro
-// mudar a mysystem para receber a taskid
-// sprintf(response_fifo, "../tmp/task_id_%d",&taskid);
+// // redirecionar aqui o ficheiro
+// // mudar a mysystem para receber a taskid
+// // sprintf(response_fifo, "../tmp/task_id_%d",&taskid);
+

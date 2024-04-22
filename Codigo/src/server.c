@@ -1,6 +1,109 @@
 #include "includes.h"
 #include "mysystem.h"
 
+void extractPipe(const char *command, int N, char **commandPipeline) {
+    const char *start = command;
+    int i = 0;
+
+    while (*start != '\0' && i < N) {
+        // Ignorar espaços em branco no início
+        while (*start == ' ' || *start == '\n') {
+            start++;
+        }
+
+        // Encontrar o fim do token
+        const char *end = start;
+        while (*end != '\0' && *end != '|' && *end != '\n') {
+            end++;
+        }
+
+        // Alocar memória para o token
+        int token_length = end - start;
+        commandPipeline[i] = (char *)malloc(token_length + 1);
+        if (commandPipeline[i] == NULL) {
+            // Lidar com erro de alocação de memória
+            exit(EXIT_FAILURE);
+        }
+
+        // Copiar o token para o array de processos
+        strncpy(commandPipeline[i], start, token_length);
+        commandPipeline[i][token_length] = '\0';
+
+        // Atualizar os índices
+        i++;
+        start = end;
+    }
+}
+
+long executePipeline(const char *command, int task_id, char *output_folder){
+    int N = 0;
+    char **commandPipeline = malloc(N * sizeof(char *));
+    extractPipe(command, N, commandPipeline);
+    int p[N - 1][2];
+    for (int i = 0; i < N - 1; i++) {
+        pipe(p[i]);
+    }
+
+    pid_t pid;
+    int fd;
+    char output_file[256];
+    sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, task_id);
+
+    for (int i = 0; i < N; i++) {
+        pid = fork();
+        if (pid == 0) {
+            // Se não for o primeiro comando, redirecionar a entrada para o pipe anterior
+            if (i > 0) {
+                dup2(p[i - 1][0], STDIN_FILENO);
+                close(p[i - 1][0]);
+                close(p[i - 1][1]);
+            }
+            // Se não for o último comando, redirecionar a saída para o próximo pipe
+            if (i < N - 1) {
+                dup2(p[i][1], STDOUT_FILENO);
+                close(p[i][0]);
+                close(p[i][1]);
+            } else {
+                // Se for o último comando, redirecionar a saída para o arquivo de saída
+                fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+                dup2(fd, STDOUT_FILENO);
+                close(fd);
+            }
+
+            // Dividir o comando em argumentos
+            char *args[20];
+            char *token = strtok(commandPipeline[i], " ");
+            int j = 0;
+            while (token != NULL) {
+                args[j++] = token;
+                token = strtok(NULL, " ");
+            }
+            args[j] = NULL;
+
+            // Executar o comando
+            long ress = mysystem(command, task_id, output_folder);
+            perror("exec");
+            exit(EXIT_FAILURE);
+        } else if (pid < 0) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Fechar todos os pipes no processo pai
+    for (int i = 0; i < N - 1; i++) {
+        close(p[i][0]);
+        close(p[i][1]);
+    }
+
+    // Esperar que todos os filhos terminem
+    int status;char *args[20];
+    while (wait(&status) > 0);
+
+    return 0; // ou retorne o tempo total, se necessário
+}
+
+
 void enqueue(FCFS_Task **queue, Progam task)
 {
     FCFS_Task *new_task = (FCFS_Task *)malloc(sizeof(FCFS_Task));
@@ -198,7 +301,8 @@ int main(int argc, char *argv[])
                     task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
                     }
                     else if (strcmp(task.mode[1], "-p") == 0){
-                        task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
+                    task.tempo_exec = executePipeline(task.command, task.taskid, argv[1]);
+
                     }
                     strcpy(task.mode[0], "fork");
                     write(fd_write, &task, sizeof(Progam));

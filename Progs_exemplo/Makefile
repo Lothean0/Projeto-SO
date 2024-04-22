@@ -1,12 +1,24 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -Iinclude
+LDFLAGS = 
+DEBUG_FLAGS = -DDEBUG_MODE
+all: folders server client
 
-all: void hello
+server: bin/server
 
-void: void.c
+client: bin/client
 
-hello: hello.c
+folders:
+	@mkdir -p src include obj bin tmp output
+  
+bin/server: obj/server.o obj/mysystem.o
+	$(CC) $(LDFLAGS) $^ -o $@
+
+bin/client: obj/client.o
+	$(CC) $(LDFLAGS) $^ -o $@
+
+obj/%.o: src/%.c
+	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -c $< -o $@
 
 clean:
-	rm -rf void hello *.dSYM
-
+	rm -rf obj/* tmp/* bin/* output/*
