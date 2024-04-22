@@ -3,6 +3,7 @@
 
 #define MAX__PARALLEL_TASKS 1000
 #define MAX_LINE_LENGTH 1024
+#define MAX_COMMANDS 1000 // Maximum number of commands in the pipeline
 
 #include <stdlib.h>
 #include <sys/types.h>
