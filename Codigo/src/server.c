@@ -165,11 +165,11 @@ int main(int argc, char *argv[])
                 if (fork() == 0)
                 {
                     task.pid = getpid();
-                    if (strcmp(task.mode[1], "-u"))
+                    if (strcmp(task.mode[1], "-u")==0)
                     {
                         task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
                     }
-                    else if (strcmp(task.mode[1], "-p"))
+                    else if (strcmp(task.mode[1], "-p")==0)
                     {
                         //task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
                     }
