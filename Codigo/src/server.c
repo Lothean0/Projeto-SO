@@ -1,5 +1,6 @@
 #include "includes.h"
 #include "mysystem.h"
+//#include "pipes.h"
 
 void enqueue(FCFS_Task **queue, Progam task)
 {
@@ -119,7 +120,14 @@ int main(int argc, char *argv[])
                     if (fork() == 0)
                     {
                         task.pid = getpid();
-                        task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                        if (strcmp(task.mode[1], "-u")==0)
+                        {
+                            task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                        }
+                        else if (strcmp(task.mode[1], "-p")==0)
+                        {
+                            //task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
+                        }
                         strcpy(task.mode[0], "fork");
                         write(fd_write, &task, sizeof(Progam));
                         close(fd_write);
@@ -157,7 +165,14 @@ int main(int argc, char *argv[])
                 if (fork() == 0)
                 {
                     task.pid = getpid();
-                    task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                    if (strcmp(task.mode[1], "-u"))
+                    {
+                        task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                    }
+                    else if (strcmp(task.mode[1], "-p"))
+                    {
+                        //task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
+                    }
                     strcpy(task.mode[0], "fork");
                     write(fd_write, &task, sizeof(Progam));
                     close(fd_write);

@@ -40,6 +40,7 @@ long mysystem(const char *command, int taskid, char *output_folder)
 		_exit(res);
 	}
 	dup2(STDOUT_FILENO, STDOUT_FILENO);
+	dup2(STDERR_FILENO, STDERR_FILENO);
 	wait(&res);
 	res = WEXITSTATUS(res);
 	gettimeofday(&fim, NULL);

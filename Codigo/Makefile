@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g -Iinclude
-LDFLAGS = -lm
+LDFLAGS = 
 DEBUG_FLAGS = -DDEBUG_MODE
 all: folders server client
 
@@ -11,7 +11,7 @@ client: bin/client
 folders:
 	@mkdir -p src include obj bin tmp output
   
-bin/server: obj/server.o obj/mysystem.o 
+bin/server: obj/server.o obj/mysystem.o  obj/pipes.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
 bin/client: obj/client.o
