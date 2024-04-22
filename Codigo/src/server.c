@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     int max_parallel_tasks = atoi(argv[2]);
     int running_tasks = 0;
     int quit = 0;
+    Progam running_tasks_array[max_parallel_tasks];
 
     FCFS_Task *fcfs_queue = NULL;
 
@@ -117,6 +118,7 @@ int main(int argc, char *argv[])
                 if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
                 {
                     Progam task = dequeue(&fcfs_queue);
+                    running_tasks_array[running_tasks] = task;
                     if (fork() == 0)
                     {
                         task.pid = getpid();
@@ -153,7 +155,7 @@ int main(int argc, char *argv[])
         {
             waitpid(args->pid, NULL, 0);
             char buffer[500];
-            sprintf(buffer, "Taskid: %d\nProgama:%s\nTempo execução: %ld\n\n", args->taskid, args->command, args->tempo_exec);
+            sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
             lseek(fd_out, 0, SEEK_END);
             write(fd_out, buffer, strlen(buffer));
@@ -162,6 +164,7 @@ int main(int argc, char *argv[])
             if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
             {
                 Progam task = dequeue(&fcfs_queue);
+                running_tasks_array[running_tasks] = task;
                 if (fork() == 0)
                 {
                     task.pid = getpid();
@@ -183,6 +186,45 @@ int main(int argc, char *argv[])
                     running_tasks++;
                 }
             }
+        }
+        else if(strcmp(args->mode[0],"status")==0)
+        {
+            char response_fifo_exec[256];
+            char response_fifo_sched[256];
+            char response_fifo_done[256];
+            sprintf(response_fifo_exec, "../tmp/response_fifo_%d_exec", args->pid);
+            sprintf(response_fifo_sched, "../tmp/response_fifo_%d_sched", args->pid);
+            sprintf(response_fifo_done, "../tmp/response_fifo_%d_done", args->pid);
+            int fd_response_exec = open(response_fifo_exec, O_WRONLY);
+            if (fd_response_exec == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            int fd_response_sched = open(response_fifo_sched, O_WRONLY);
+            if (fd_response_sched == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            int fd_response_done = open(response_fifo_done, O_WRONLY);
+            if (fd_response_done == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            for (int i = 0; i < running_tasks; i++)
+            {
+                write(fd_response_exec, &running_tasks_array[i], sizeof(Progam));
+            }
+            close(fd_response_exec);
+            for (FCFS_Task *current = fcfs_queue; current != NULL; current = current->next)
+            {
+                write(fd_response_sched, &current->task, sizeof(Progam));
+            }
+            close(fd_response_sched);   
+            write(fd_response_done, output_file_full, strlen(output_file_full)+1);
+            close(fd_response_done);
         }
         else if (strcmp(args->mode[0], "quit") == 0)
         {
