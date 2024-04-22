@@ -38,11 +38,6 @@ int main(int argc, char *argv[])
             strcat(args->command, " ");
             strcat(args->command, argv[i]);
         }
-        // printf("argc: %d\n", args->argc);
-        // printf("mode[0]: %s\n", args->mode[0]);
-        // printf("mode[1]: %s\n", args->mode[1]);
-        // printf("time: %d\n", args->time);
-        // printf("args: %s\n", args->command);
 
         write(fd, args, sizeof(Progam));
         close(fd);
@@ -196,7 +191,6 @@ int main(int argc, char *argv[])
         args->time = 0;
         strcpy(args->mode[1], "");
         strcpy(args->command, "");
-        // printf("mode[0]: %s\n", args->mode[0]);
         args->tempo_exec = 0;
         write(fd, args, sizeof(Progam));
         close(fd);

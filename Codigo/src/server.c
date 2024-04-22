@@ -54,6 +54,38 @@ void enqueue_sjf(FCFS_Task **queue, Progam task)
     }
 }
 
+void enqueue_ljf(FCFS_Task **queue, Progam task)
+{
+    FCFS_Task *new_task = (FCFS_Task *)malloc(sizeof(FCFS_Task));
+    new_task->task = task;
+    new_task->next = NULL;
+
+    if (*queue == NULL)
+    {                      // Queue is empty
+        *queue = new_task; // Set the new task as the first task in the queue
+    }
+    else
+    {
+        FCFS_Task *current = *queue;
+        FCFS_Task *prev = NULL;
+        while (current != NULL && current->task.time > task.time)
+        { // Find the correct position for the new task
+            prev = current;
+            current = current->next;
+        }
+        if (prev == NULL)
+        { // The new task has the shortest execution time
+            new_task->next = *queue;
+            *queue = new_task;
+        }
+        else
+        { // Insert the new task between prev and current
+            prev->next = new_task;
+            new_task->next = current;
+        }
+    }
+}
+
 Progam dequeue(FCFS_Task **queue)
 {
     FCFS_Task *temp = *queue; // Get the first task in the queue
@@ -105,6 +137,10 @@ int main(int argc, char *argv[])
                 if (strcmp(sched_policy, "SJF") == 0)
                 {
                     enqueue_sjf(&fcfs_queue, *args);
+                }
+                else if (strcmp(sched_policy, "LJF") == 0)
+                {
+                    enqueue_ljf(&fcfs_queue, *args);
                 }
                 else
                 {

@@ -5,6 +5,6 @@
 !Makefile
 *.out
 *.o
-*.txt
+!*.txt
 output/
 !README
