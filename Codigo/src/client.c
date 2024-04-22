@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
             sprintf(execprogs_str, "%d %s\n", execprogs[i].taskid, execprogs[i].command);
             write(1, execprogs_str, strlen(execprogs_str));
         }
-        write(1, "\nScheduled\n", strlen("Scheduled:\n"));
+        write(1, "\nScheduled\n", strlen("\nScheduled:\n"));
         for (int i = 0; i < schedprogs_count; i++)
         {
             char schedprogs_str[500];
