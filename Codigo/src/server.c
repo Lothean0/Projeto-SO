@@ -11,31 +11,50 @@ void extractPipe(const char *command, int N, char **commandPipeline) {
             start++;
         }
 
-        // Encontrar o fim do token
-        const char *end = start;
-        while (*end != '\0' && *end != '|' && *end != '\n') {
-            end++;
+        // Verificar se o comando é entre aspas
+        if (*start == '"') {
+            const char *end = start + 1;
+            // Encontrar o fim do comando dentro das aspas
+            while (*end != '\0' && *end != '"') {
+                end++;
+            }
+            // Alocar memória para o token
+            int token_length = end - start - 1; // Exclui as aspas iniciais e finais
+            commandPipeline[i] = (char *)malloc(token_length + 1);
+            if (commandPipeline[i] == NULL) {
+                // Lidar com erro de alocação de memória
+                exit(EXIT_FAILURE);
+            }
+            // Copiar o token para o array de processos
+            strncpy(commandPipeline[i], start + 1, token_length);
+            commandPipeline[i][token_length] = '\0';
+            // Atualizar os índices
+            i++;
+            start = end + 1; // Avançar além das aspas finais
+        } else {
+            // Encontrar o fim do token
+            const char *end = start;
+            while (*end != '\0' && *end != '|' && *end != '\n') {
+                end++;
+            }
+            // Alocar memória para o token
+            int token_length = end - start;
+            commandPipeline[i] = (char *)malloc(token_length + 1);
+            if (commandPipeline[i] == NULL) {
+                // Lidar com erro de alocação de memória
+                exit(EXIT_FAILURE);
+            }
+            // Copiar o token para o array de processos
+            strncpy(commandPipeline[i], start, token_length);
+            commandPipeline[i][token_length] = '\0';
+            // Atualizar os índices
+            i++;
+            start = end;
         }
-
-        // Alocar memória para o token
-        int token_length = end - start;
-        commandPipeline[i] = (char *)malloc(token_length + 1);
-        if (commandPipeline[i] == NULL) {
-            // Lidar com erro de alocação de memória
-            exit(EXIT_FAILURE);
-        }
-
-        // Copiar o token para o array de processos
-        strncpy(commandPipeline[i], start, token_length);
-        commandPipeline[i][token_length] = '\0';
-
-        // Atualizar os índices
-        i++;
-        start = end;
     }
 }
 
-long executePipeline(const char *command, int task_id, char *output_folder){
+long executePipeline(const char *command, int task_id, char *output_folder) {
     int N = 0;
     char **commandPipeline = malloc(N * sizeof(char *));
     extractPipe(command, N, commandPipeline);
@@ -81,7 +100,7 @@ long executePipeline(const char *command, int task_id, char *output_folder){
             args[j] = NULL;
 
             // Executar o comando
-            long ress = mysystem(command, task_id, output_folder);
+            execvp(args[0], args);
             perror("exec");
             exit(EXIT_FAILURE);
         } else if (pid < 0) {
@@ -97,11 +116,12 @@ long executePipeline(const char *command, int task_id, char *output_folder){
     }
 
     // Esperar que todos os filhos terminem
-    int status;char *args[20];
+    int status;
     while (wait(&status) > 0);
 
     return 0; // ou retorne o tempo total, se necessário
 }
+
 
 
 void enqueue(FCFS_Task **queue, Progam task)
