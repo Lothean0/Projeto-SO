@@ -1,6 +1,6 @@
 #include "includes.h"
 #include "mysystem.h"
-//#include "pipes.h"
+// #include "pipes.h"
 
 void enqueue(FCFS_Task **queue, Progam task)
 {
@@ -158,13 +158,13 @@ int main(int argc, char *argv[])
                     if (fork() == 0)
                     {
                         task.pid = getpid();
-                        if (strcmp(task.mode[1], "-u")==0)
+                        if (strcmp(task.mode[1], "-u") == 0)
                         {
                             task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
                         }
-                        else if (strcmp(task.mode[1], "-p")==0)
+                        else if (strcmp(task.mode[1], "-p") == 0)
                         {
-                            //task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
+                            // task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
                         }
                         strcpy(task.mode[0], "fork");
                         write(fd_write, &task, sizeof(Progam));
@@ -189,6 +189,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(args->mode[0], "fork") == 0)
         {
+            int ftask=0;
             waitpid(args->pid, NULL, 0);
             char buffer[500];
             sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);
@@ -196,21 +197,30 @@ int main(int argc, char *argv[])
             lseek(fd_out, 0, SEEK_END);
             write(fd_out, buffer, strlen(buffer));
             close(fd_out);
+            for (int i = 0; i < running_tasks; i++)
+            {
+                if (args->taskid == running_tasks_array[i].taskid)
+                {
+                    ftask = i;
+                    break;
+                }
+            }
+
             running_tasks--;
             if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
             {
                 Progam task = dequeue(&fcfs_queue);
-                running_tasks_array[running_tasks] = task;
+                running_tasks_array[ftask] = task;
                 if (fork() == 0)
                 {
                     task.pid = getpid();
-                    if (strcmp(task.mode[1], "-u")==0)
+                    if (strcmp(task.mode[1], "-u") == 0)
                     {
                         task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
                     }
-                    else if (strcmp(task.mode[1], "-p")==0)
+                    else if (strcmp(task.mode[1], "-p") == 0)
                     {
-                        //task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
+                        // task.tempo_exec = pipes(task.command, task.taskid, argv[1]);
                     }
                     strcpy(task.mode[0], "fork");
                     write(fd_write, &task, sizeof(Progam));
@@ -223,7 +233,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        else if(strcmp(args->mode[0],"status")==0)
+        else if (strcmp(args->mode[0], "status") == 0)
         {
             char response_fifo_exec[256];
             char response_fifo_sched[256];
@@ -258,8 +268,8 @@ int main(int argc, char *argv[])
             {
                 write(fd_response_sched, &current->task, sizeof(Progam));
             }
-            close(fd_response_sched);   
-            write(fd_response_done, output_file_full, strlen(output_file_full)+1);
+            close(fd_response_sched);
+            write(fd_response_done, output_file_full, strlen(output_file_full) + 1);
             close(fd_response_done);
         }
         else if (strcmp(args->mode[0], "quit") == 0)
