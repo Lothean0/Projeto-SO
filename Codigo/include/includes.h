@@ -23,7 +23,7 @@ typedef struct Progam
 {
 pid_t pid;
 int taskid;
-int argc;
+int argc; 
 char mode[2][8]; //execute or status e -u ou -p
 int time;
 char command[300];
