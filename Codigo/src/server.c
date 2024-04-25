@@ -109,7 +109,13 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s output_folder parallel-tasks sched-policy\n", argv[0]);
         return -1;
     }
-
+    struct stat st = {0};
+    char output_folder[256];
+    sprintf(output_folder, "../%s", argv[1]);
+    if (stat(output_folder, &st) == -1)
+    {
+        mkdir(output_folder, 0700);
+    }
     char output_file_full[256];
     sprintf(output_file_full, "../%s/output_full.txt", argv[1]);
     char fifopath[18] = "../tmp/fifo";
@@ -189,7 +195,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(args->mode[0], "fork") == 0)
         {
-            int ftask=0;
+            int ftask = 0;
             waitpid(args->pid, NULL, 0);
             char buffer[500];
             sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);

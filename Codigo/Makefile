@@ -9,7 +9,7 @@ server: bin/server
 client: bin/client
 
 folders:
-	@mkdir -p src include obj bin tmp output
+	@mkdir -p src include obj bin tmp 
   
 bin/server: obj/server.o obj/mysystem.o obj/exec_pipes.o
 	$(CC) $(LDFLAGS) $^ -o $@
@@ -21,4 +21,4 @@ obj/%.o: src/%.c
 	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -c $< -o $@
 
 clean:
-	rm -rf obj/* tmp/* bin/* output/*
+	rm -rf obj/* tmp/* bin/*

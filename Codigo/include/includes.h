@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <time.h>
+
 struct tempo{
 	long segundos;
 	long microseg;
