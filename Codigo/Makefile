@@ -22,3 +22,8 @@ obj/%.o: src/%.c
 
 clean:
 	rm -rf obj/* tmp/* bin/*
+
+cleanout:
+	rm -rf output/*
+
+cleanall: clean cleanout
