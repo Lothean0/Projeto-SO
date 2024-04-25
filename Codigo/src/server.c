@@ -96,7 +96,7 @@ Progam dequeue(FCFS_Task **queue)
 }
 
 int compare_tasks(const void *a, const void *b)
-{ // void pointer because qsort requires a function with this signature
+{
     Progam *task_a = (Progam *)a;
     Progam *task_b = (Progam *)b;
     return task_a->time - task_b->time;
@@ -104,9 +104,13 @@ int compare_tasks(const void *a, const void *b)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
-    {
-        fprintf(stderr, "Usage: %s output_folder parallel-tasks sched-policy\n", argv[0]);
+     if (argc < 4)
+    {   //acrescentei
+        const char *message = "Usage: ";
+        write(STDERR_FILENO, message, strlen(message));
+        write(STDERR_FILENO, argv[0], strlen(argv[0]));
+        const char *message2 = " output_folder parallel-tasks sched-policy\n";
+        write(STDERR_FILENO, message2, strlen(message2));
         return -1;
     }
     struct stat st = {0};
@@ -122,7 +126,19 @@ int main(int argc, char *argv[])
     mkfifo(fifopath, 0666);
     int taskid = 1;
     int fd = open(fifopath, O_RDONLY);
+    //acrescentei
+    if (fd == -1)
+    {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
     int fd_write = open(fifopath, O_WRONLY);
+    //acrescentei
+    if (fd_write == -1)
+    {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
     char *sched_policy = argv[3];
     int max_parallel_tasks = atoi(argv[2]);
     int running_tasks = 0;
@@ -155,6 +171,12 @@ int main(int argc, char *argv[])
                 char response_fifo[256];
                 sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
+                //acrescentei
+                if (fd_response == -1)
+                {
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
                 write(fd_response, &args->taskid, sizeof(int));
                 close(fd_response);
                 if (running_tasks < max_parallel_tasks && fcfs_queue != NULL)
@@ -188,6 +210,12 @@ int main(int argc, char *argv[])
                 char response_fifo[256];
                 sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
+                //acrescentei
+                if (fd_response == -1)
+                {
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
                 int res = -1;
                 write(fd_response, &res, sizeof(int));
                 close(fd_response);
@@ -200,6 +228,12 @@ int main(int argc, char *argv[])
             char buffer[500];
             sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
+            //acrescentei
+            if (fd_out == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
             lseek(fd_out, 0, SEEK_END);
             write(fd_out, buffer, strlen(buffer));
             close(fd_out);

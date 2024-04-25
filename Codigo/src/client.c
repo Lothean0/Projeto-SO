@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
     pid_t pid = getpid();
     char *fifopath = "../tmp/fifo";
     if (argc < 2)
-    {
-        return -1;
+    {   //mudei
+        perror("Number invalid of arguments");
     }
 
     if (strcmp(argv[1], "execute") == 0)
@@ -159,6 +159,12 @@ int main(int argc, char *argv[])
         while (read(fd_response_done, donefilepath, 256) > 0) {}
         write(1, "\nCompleted\n", strlen("\nCompleted\n"));
         int fd_done = open(donefilepath, O_RDONLY); // Open the file specified by donefilepath
+        //acrescentei
+        if (fd_done == -1)
+        {
+            perror("open");
+            exit(EXIT_FAILURE);
+        }
         if (fd_done != -1){
         ssize_t bytesRead;
         while ((bytesRead = read(fd_done, donefilepath, 256)) > 0)

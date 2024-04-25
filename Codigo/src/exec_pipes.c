@@ -50,7 +50,19 @@ long exec_pipes(const char *arg, int taskid, char *output_folder)
                 char output_file[256];
                 sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, taskid);
                 int fd = open(output_file, O_WRONLY | O_CREAT, 0666);
+                //acrescentei
+                if (fd == -1)
+                {
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
                 dup2(fd, 1);
+                //acrescentei
+                if (dup2(fd, 1) == -1)
+                {
+                    perror("dup2");
+                    exit(EXIT_FAILURE);
+                }
                 close(fd);
             }
             close(fd[0]);

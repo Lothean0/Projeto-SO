@@ -11,9 +11,31 @@ long mysystem(const char *command, int taskid, char *output_folder)
 	char output_file[256];
 	sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, taskid);
 	int fd = open(output_file, O_WRONLY | O_CREAT, 0666);
+	//acrescentei
+
+	if (fd == -1)
+	{
+		perror("open");
+		exit(EXIT_FAILURE);
+	}
 	dup2(fd, STDOUT_FILENO);
+	//acrescentei
+
+	if (dup2(fd, STDOUT_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(EXIT_FAILURE);
+	}
 	close(fd);
+	//acrescentei
+	fd = open(output_file, O_WRONLY | O_CREAT, 0666);
 	dup2(fd, STDERR_FILENO);
+	//acrescentei
+	if (dup2(fd, STDERR_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(EXIT_FAILURE);
+	}
 	// Estamos a assumir numero maximo de argumentos
 	// isto teria de ser melhorado com realloc por exemplo
 	char *exec_args[20];
@@ -40,7 +62,19 @@ long mysystem(const char *command, int taskid, char *output_folder)
 		_exit(res);
 	}
 	dup2(STDOUT_FILENO, STDOUT_FILENO);
+	//acrescentei
+	if (dup2(STDOUT_FILENO, STDOUT_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(EXIT_FAILURE);
+	}
 	dup2(STDERR_FILENO, STDERR_FILENO);
+	//acrescentei
+	if (dup2(STDERR_FILENO, STDERR_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(EXIT_FAILURE);
+	}
 	wait(&res);
 	res = WEXITSTATUS(res);
 	gettimeofday(&fim, NULL);
