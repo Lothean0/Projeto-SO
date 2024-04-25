@@ -11,7 +11,7 @@ client: bin/client
 folders:
 	@mkdir -p src include obj bin tmp output
   
-bin/server: obj/server.o obj/mysystem.o
+bin/server: obj/server.o obj/mysystem.o obj/exec_pipes.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
 bin/client: obj/client.o
