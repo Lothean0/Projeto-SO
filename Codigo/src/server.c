@@ -122,17 +122,16 @@ int main(int argc, char *argv[])
     }
     char output_file_full[256];
     sprintf(output_file_full, "../%s/output_full.txt", argv[1]);
-    char fifopath[18] = "../tmp/fifo";
-    mkfifo(fifopath, 0666);
+    mkfifo(SERVER, 0666);
     int taskid = 1;
-    int fd = open(fifopath, O_RDONLY);
+    int fd = open(SERVER, O_RDONLY);
     //acrescentei
     if (fd == -1)
     {
         perror("open");
         exit(EXIT_FAILURE);
     }
-    int fd_write = open(fifopath, O_WRONLY);
+    int fd_write = open(SERVER, O_WRONLY);
     //acrescentei
     if (fd_write == -1)
     {
@@ -169,7 +168,7 @@ int main(int argc, char *argv[])
                     enqueue(&fcfs_queue, *args);
                 }
                 char response_fifo[256];
-                sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
+                sprintf(response_fifo, CLIENT"%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
                 //acrescentei
                 if (fd_response == -1)
@@ -208,7 +207,7 @@ int main(int argc, char *argv[])
             else
             {
                 char response_fifo[256];
-                sprintf(response_fifo, "../tmp/response_fifo_%d", args->pid);
+                sprintf(response_fifo, CLIENT"%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
                 //acrescentei
                 if (fd_response == -1)
@@ -278,9 +277,9 @@ int main(int argc, char *argv[])
             char response_fifo_exec[256];
             char response_fifo_sched[256];
             char response_fifo_done[256];
-            sprintf(response_fifo_exec, "../tmp/response_fifo_%d_exec", args->pid);
-            sprintf(response_fifo_sched, "../tmp/response_fifo_%d_sched", args->pid);
-            sprintf(response_fifo_done, "../tmp/response_fifo_%d_done", args->pid);
+            sprintf(response_fifo_exec, CLIENT"%d_exec", args->pid);
+            sprintf(response_fifo_sched, CLIENT"%d_sched", args->pid);
+            sprintf(response_fifo_done, CLIENT"%d_done", args->pid);
             int fd_response_exec = open(response_fifo_exec, O_WRONLY);
             if (fd_response_exec == -1)
             {
@@ -290,12 +289,15 @@ int main(int argc, char *argv[])
             int fd_response_sched = open(response_fifo_sched, O_WRONLY);
             if (fd_response_sched == -1)
             {
+                unlink(response_fifo_exec);
                 perror("open");
                 exit(EXIT_FAILURE);
             }
             int fd_response_done = open(response_fifo_done, O_WRONLY);
             if (fd_response_done == -1)
             {
+                unlink(response_fifo_exec);
+                unlink(response_fifo_sched);
                 perror("open");
                 exit(EXIT_FAILURE);
             }
@@ -321,7 +323,7 @@ int main(int argc, char *argv[])
             free(args);
             close(fd_write);
             close(fd);
-            unlink(fifopath);
+            unlink(SERVER);
             return 0;
         }
     }

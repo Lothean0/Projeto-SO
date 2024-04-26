@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
 {
     int taskid;
     pid_t pid = getpid();
-    char *fifopath = "../tmp/fifo";
+    char *fifopath = SERVER;
     if (argc < 2)
     {   //mudei
         perror("Number invalid of arguments");
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "execute") == 0)
     {
         char response_fifo[256];
-        sprintf(response_fifo, "../tmp/response_fifo_%d", pid);
+        sprintf(response_fifo, CLIENT"%d", pid);
         if (mkfifo(response_fifo, 0666) == -1)
         {
             perror("mkfifo");
@@ -61,9 +61,9 @@ int main(int argc, char *argv[])
         char response_fifo_exec[256];
         char response_fifo_sched[256];
         char response_fifo_done[256];
-        sprintf(response_fifo_exec, "../tmp/response_fifo_%d_exec", pid);
-        sprintf(response_fifo_sched, "../tmp/response_fifo_%d_sched", pid);
-        sprintf(response_fifo_done, "../tmp/response_fifo_%d_done", pid);
+        sprintf(response_fifo_exec, CLIENT"%d_exec", pid);
+        sprintf(response_fifo_sched, CLIENT"%d_sched", pid);
+        sprintf(response_fifo_done, CLIENT"%d_done", pid);
         if (mkfifo(response_fifo_exec, 0666) == -1)
         {
             perror("mkfifo");
@@ -71,17 +71,23 @@ int main(int argc, char *argv[])
         }
         if (mkfifo(response_fifo_sched, 0666) == -1)
         {
+            unlink(response_fifo_exec);
             perror("mkfifo");
             exit(EXIT_FAILURE);
         }
         if (mkfifo(response_fifo_done, 0666) == -1)
         {
+            unlink(response_fifo_exec);
+            unlink(response_fifo_sched);
             perror("mkfifo");
             exit(EXIT_FAILURE);
         }
         int fd = open(fifopath, O_WRONLY);
         if (fd == -1)
         {
+            unlink(response_fifo_done);
+            unlink(response_fifo_sched);
+            unlink(response_fifo_exec);
             perror("open");
             exit(EXIT_FAILURE);
         }
@@ -104,12 +110,15 @@ int main(int argc, char *argv[])
         int fd_response_sched = open(response_fifo_sched, O_RDONLY);
         if (fd_response_sched == -1)
         {
+            unlink(response_fifo_exec);
             perror("open");
             exit(EXIT_FAILURE);
         }
         int fd_response_done = open(response_fifo_done, O_RDONLY);
         if (fd_response_done == -1)
         {
+            unlink(response_fifo_exec);
+            unlink(response_fifo_sched);
             perror("open");
             exit(EXIT_FAILURE);
         }

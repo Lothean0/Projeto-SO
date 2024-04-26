@@ -3,6 +3,8 @@
 
 #define MAX__PARALLEL_TASKS 1000
 #define MAX_LINE_LENGTH 1024
+#define SERVER "../tmp/fifo"
+#define CLIENT "../tmp/response_fifo_"
 
 #include <stdlib.h>
 #include <sys/types.h>
