@@ -95,13 +95,6 @@ Progam dequeue(FCFS_Task **queue)
     return task;              // Return the task
 }
 
-int compare_tasks(const void *a, const void *b)
-{
-    Progam *task_a = (Progam *)a;
-    Progam *task_b = (Progam *)b;
-    return task_a->time - task_b->time;
-}
-
 int main(int argc, char *argv[])
 {
      if (argc < 4)
