@@ -48,7 +48,7 @@ long exec_pipes(const char *arg, int taskid, char *output_folder)
             {
                 // last command and no more commands to be executed, redirect output to a file
                 char output_file[256];
-                sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, taskid);
+                sprintf(output_file, "../%s/output_task_id_%d", output_folder, taskid);
                 int fd = open(output_file, O_WRONLY | O_CREAT, 0666);
                 //acrescentei
                 if (fd == -1)
