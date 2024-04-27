@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         mkdir(output_folder, 0700);
     }
     char output_file_full[256];
-    sprintf(output_file_full, "../%s/output_full.txt", argv[1]);
+    sprintf(output_file_full, "../%s/output_full", argv[1]);
     mkfifo(SERVER, 0666);
     int taskid = 1;
     int fd = open(SERVER, O_RDONLY);
@@ -217,8 +217,6 @@ int main(int argc, char *argv[])
         {
             int ftask = 0;
             waitpid(args->pid, NULL, 0);
-            char buffer[500];
-            sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
             // acrescentei
             if (fd_out == -1)
@@ -226,8 +224,12 @@ int main(int argc, char *argv[])
                 perror("open");
                 exit(EXIT_FAILURE);
             }
+            Finished_task tasktowrite;
+            tasktowrite.taskid = args->taskid;
+            tasktowrite.tempo_exec = args->tempo_exec;
+            strcpy(tasktowrite.command, args->command);
             lseek(fd_out, 0, SEEK_END);
-            write(fd_out, buffer, strlen(buffer));
+            write(fd_out, &tasktowrite, sizeof(Finished_task));
             close(fd_out);
             for (int i = 0; i < running_tasks; i++)
             {
@@ -306,7 +308,13 @@ int main(int argc, char *argv[])
                     write(fd_response_sched, &current->task, sizeof(Progam));
                 }
                 close(fd_response_sched);
-                write(fd_response_done, output_file_full, strlen(output_file_full) + 1);
+                int fdout=open(output_file_full, O_RDONLY);
+                Finished_task tasktoread;
+                while (read(fdout, &tasktoread, sizeof(Finished_task)) > 0)
+                {
+                    write(fd_response_done, &tasktoread, sizeof(Finished_task));
+                }
+                close(fdout);
                 close(fd_response_done);
                 args->pid = getpid();
                 strcpy(args->mode[0], "statusf");
