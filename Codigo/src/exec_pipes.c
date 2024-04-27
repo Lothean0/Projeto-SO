@@ -3,6 +3,10 @@
 
 long exec_pipes(const char *arg, int taskid, char *output_folder)
 {
+    struct tempo comeco, fim;
+    long segundos, microseg;
+
+    gettimeofday(&comeco, NULL);
     int in_fd = 0; // input file descriptor
     char *command = strdup(arg);
     char *commands[10];
@@ -18,10 +22,6 @@ long exec_pipes(const char *arg, int taskid, char *output_folder)
     }
     commands[i] = NULL;
 
-    struct tempo comeco, fim;
-    long segundos, microseg;
-
-    gettimeofday(&comeco, NULL);
     pid_t pid[i];
     // execute each command
     for (int j = 0; j < i; j++)
