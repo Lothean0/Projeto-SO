@@ -97,8 +97,8 @@ Progam dequeue(FCFS_Task **queue)
 
 int main(int argc, char *argv[])
 {
-     if (argc < 4)
-    {   //acrescentei
+    if (argc < 4)
+    { // acrescentei
         const char *message = "Usage: ";
         write(STDERR_FILENO, message, strlen(message));
         write(STDERR_FILENO, argv[0], strlen(argv[0]));
@@ -118,14 +118,14 @@ int main(int argc, char *argv[])
     mkfifo(SERVER, 0666);
     int taskid = 1;
     int fd = open(SERVER, O_RDONLY);
-    //acrescentei
+    // acrescentei
     if (fd == -1)
     {
         perror("open");
         exit(EXIT_FAILURE);
     }
     int fd_write = open(SERVER, O_WRONLY);
-    //acrescentei
+    // acrescentei
     if (fd_write == -1)
     {
         perror("open");
@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
                     enqueue(&fcfs_queue, *args);
                 }
                 char response_fifo[256];
-                sprintf(response_fifo, CLIENT"%d", args->pid);
+                sprintf(response_fifo, CLIENT "%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
-                //acrescentei
+                // acrescentei
                 if (fd_response == -1)
                 {
                     perror("open");
@@ -200,9 +200,9 @@ int main(int argc, char *argv[])
             else
             {
                 char response_fifo[256];
-                sprintf(response_fifo, CLIENT"%d", args->pid);
+                sprintf(response_fifo, CLIENT "%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
-                //acrescentei
+                // acrescentei
                 if (fd_response == -1)
                 {
                     perror("open");
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
             char buffer[500];
             sprintf(buffer, "%d %s %ld ms\n", args->taskid, args->command, args->tempo_exec);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
-            //acrescentei
+            // acrescentei
             if (fd_out == -1)
             {
                 perror("open");
@@ -267,45 +267,57 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(args->mode[0], "status") == 0)
         {
-            char response_fifo_exec[256];
-            char response_fifo_sched[256];
-            char response_fifo_done[256];
-            sprintf(response_fifo_exec, CLIENT"%d_exec", args->pid);
-            sprintf(response_fifo_sched, CLIENT"%d_sched", args->pid);
-            sprintf(response_fifo_done, CLIENT"%d_done", args->pid);
-            int fd_response_exec = open(response_fifo_exec, O_WRONLY);
-            if (fd_response_exec == -1)
+            if (fork() == 0)
             {
-                perror("open");
-                exit(EXIT_FAILURE);
+                char response_fifo_exec[256];
+                char response_fifo_sched[256];
+                char response_fifo_done[256];
+                sprintf(response_fifo_exec, CLIENT "%d_exec", args->pid);
+                sprintf(response_fifo_sched, CLIENT "%d_sched", args->pid);
+                sprintf(response_fifo_done, CLIENT "%d_done", args->pid);
+                int fd_response_exec = open(response_fifo_exec, O_WRONLY);
+                if (fd_response_exec == -1)
+                {
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
+                int fd_response_sched = open(response_fifo_sched, O_WRONLY);
+                if (fd_response_sched == -1)
+                {
+                    unlink(response_fifo_exec);
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
+                int fd_response_done = open(response_fifo_done, O_WRONLY);
+                if (fd_response_done == -1)
+                {
+                    unlink(response_fifo_exec);
+                    unlink(response_fifo_sched);
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
+                for (int i = 0; i < running_tasks; i++)
+                {
+                    write(fd_response_exec, &running_tasks_array[i], sizeof(Progam));
+                }
+                close(fd_response_exec);
+                for (FCFS_Task *current = fcfs_queue; current != NULL; current = current->next)
+                {
+                    write(fd_response_sched, &current->task, sizeof(Progam));
+                }
+                close(fd_response_sched);
+                write(fd_response_done, output_file_full, strlen(output_file_full) + 1);
+                close(fd_response_done);
+                args->pid = getpid();
+                strcpy(args->mode[0], "statusf");
+                write(fd_write, args, sizeof(Progam));
+                close(fd_write);
+                exit(0);
             }
-            int fd_response_sched = open(response_fifo_sched, O_WRONLY);
-            if (fd_response_sched == -1)
-            {
-                unlink(response_fifo_exec);
-                perror("open");
-                exit(EXIT_FAILURE);
-            }
-            int fd_response_done = open(response_fifo_done, O_WRONLY);
-            if (fd_response_done == -1)
-            {
-                unlink(response_fifo_exec);
-                unlink(response_fifo_sched);
-                perror("open");
-                exit(EXIT_FAILURE);
-            }
-            for (int i = 0; i < running_tasks; i++)
-            {
-                write(fd_response_exec, &running_tasks_array[i], sizeof(Progam));
-            }
-            close(fd_response_exec);
-            for (FCFS_Task *current = fcfs_queue; current != NULL; current = current->next)
-            {
-                write(fd_response_sched, &current->task, sizeof(Progam));
-            }
-            close(fd_response_sched);
-            write(fd_response_done, output_file_full, strlen(output_file_full) + 1);
-            close(fd_response_done);
+        }
+        else if (strcmp(args->mode[0], "statusf")==0)
+        {
+            waitpid(args->pid, NULL, 0);
         }
         else if (strcmp(args->mode[0], "quit") == 0)
         {
