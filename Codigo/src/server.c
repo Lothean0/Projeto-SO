@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            Finished_task tasktowrite;
+            Finished_task tasktowrite = {0};
             tasktowrite.taskid = args->taskid;
             tasktowrite.tempo_exec = args->tempo_exec;
             strcpy(tasktowrite.command, args->command);
