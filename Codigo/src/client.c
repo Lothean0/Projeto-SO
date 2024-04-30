@@ -164,18 +164,14 @@ int main(int argc, char *argv[])
             sprintf(schedprogs_str, "%d %s\n", schedprogs[i].taskid, schedprogs[i].command);
             write(1, schedprogs_str, strlen(schedprogs_str));
         }
-        char donefilepath[256];
-        while (read(fd_response_done, donefilepath, 256) > 0) {}
         write(1, "\nCompleted\n", strlen("\nCompleted\n"));
-        int fd_done = open(donefilepath, O_RDONLY); // Open the file specified by donefilepath
-        if (fd_done != -1){
-        ssize_t bytesRead;
-        while ((bytesRead = read(fd_done, donefilepath, 256)) > 0)
+        Finished_task tasktowrite;
+        while (read(fd_response_done, &tasktowrite, sizeof(Finished_task)) > 0)
         {
-            write(1, donefilepath, bytesRead);
+            char done_str[500];
+            sprintf(done_str, "%d %s %ld\n", tasktowrite.taskid, tasktowrite.command, tasktowrite.tempo_exec);
+            write(1, done_str, strlen(done_str));
         }
-        }
-        close(fd_done);
         close(fd_response_exec);
         close(fd_response_sched);
         close(fd_response_done);

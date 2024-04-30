@@ -3,6 +3,10 @@
 
 long exec_pipes(const char *arg, int taskid, char *output_folder)
 {
+    struct tempo comeco, fim;
+    long segundos, microseg;
+
+    gettimeofday(&comeco, NULL);
     int in_fd = 0; // input file descriptor
     char *command = strdup(arg);
     char *commands[10];
@@ -18,10 +22,6 @@ long exec_pipes(const char *arg, int taskid, char *output_folder)
     }
     commands[i] = NULL;
 
-    struct tempo comeco, fim;
-    long segundos, microseg;
-
-    gettimeofday(&comeco, NULL);
     pid_t pid[i];
     // execute each command
     for (int j = 0; j < i; j++)
@@ -48,7 +48,7 @@ long exec_pipes(const char *arg, int taskid, char *output_folder)
             {
                 // last command and no more commands to be executed, redirect output to a file
                 char output_file[256];
-                sprintf(output_file, "../%s/output_task_id_%d.txt", output_folder, taskid);
+                sprintf(output_file, "../%s/output_task_id_%d", output_folder, taskid);
                 int fd = open(output_file, O_WRONLY | O_CREAT, 0666);
                 //acrescentei
                 if (fd == -1)

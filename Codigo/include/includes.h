@@ -33,12 +33,12 @@ typedef struct Progam
     long tempo_exec;
 } Progam;
 
-typedef struct finished_task
+typedef struct Finished_task
 {
     int taskid;
     char command[300];
     long tempo_exec;
-} finished_task;
+} Finished_task;
 
 typedef struct FCFS_Task
 {
