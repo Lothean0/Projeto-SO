@@ -9,17 +9,17 @@ void enqueue(FCFS_Task **queue, Progam task)
     new_task->next = NULL;
 
     if (*queue == NULL)
-    {                      // Queue is empty
-        *queue = new_task; // Set the new task as the first task in the queue
+    {                      
+        *queue = new_task; 
     }
     else
     {
-        FCFS_Task *current = *queue; // Traverse the queue to find the last task
+        FCFS_Task *current = *queue; 
         while (current->next != NULL)
-        {                            // Find the last task in the queue
-            current = current->next; // Move to the next task
+        {                            
+            current = current->next; 
         }
-        current->next = new_task; // Set the new task as the last task in the queue
+        current->next = new_task; 
     }
 }
 void enqueue_sjf(FCFS_Task **queue, Progam task)
@@ -29,25 +29,25 @@ void enqueue_sjf(FCFS_Task **queue, Progam task)
     new_task->next = NULL;
 
     if (*queue == NULL)
-    {                      // Queue is empty
-        *queue = new_task; // Set the new task as the first task in the queue
+    {                      
+        *queue = new_task; 
     }
     else
     {
         FCFS_Task *current = *queue;
         FCFS_Task *prev = NULL;
         while (current != NULL && current->task.time < task.time)
-        { // Find the correct position for the new task
+        { 
             prev = current;
             current = current->next;
         }
         if (prev == NULL)
-        { // The new task has the shortest execution time
+        { 
             new_task->next = *queue;
             *queue = new_task;
         }
         else
-        { // Insert the new task between prev and current
+        { 
             prev->next = new_task;
             new_task->next = current;
         }
@@ -61,25 +61,25 @@ void enqueue_ljf(FCFS_Task **queue, Progam task)
     new_task->next = NULL;
 
     if (*queue == NULL)
-    {                      // Queue is empty
-        *queue = new_task; // Set the new task as the first task in the queue
+    {                      
+        *queue = new_task; 
     }
     else
     {
         FCFS_Task *current = *queue;
         FCFS_Task *prev = NULL;
         while (current != NULL && current->task.time > task.time)
-        { // Find the correct position for the new task
+        { 
             prev = current;
             current = current->next;
         }
         if (prev == NULL)
-        { // The new task has the shortest execution time
+        { 
             new_task->next = *queue;
             *queue = new_task;
         }
         else
-        { // Insert the new task between prev and current
+        { 
             prev->next = new_task;
             new_task->next = current;
         }
@@ -88,17 +88,17 @@ void enqueue_ljf(FCFS_Task **queue, Progam task)
 
 Progam dequeue(FCFS_Task **queue)
 {
-    FCFS_Task *temp = *queue; // Get the first task in the queue
-    Progam task = temp->task; // Get the task from the FCFS_Task struct
-    *queue = (*queue)->next;  // Set the next task as the first task in the queue
-    free(temp);               // Free the memory allocated for the FCFS_Task struct
-    return task;              // Return the task
+    FCFS_Task *temp = *queue; 
+    Progam task = temp->task; 
+    *queue = (*queue)->next;  
+    free(temp);               
+    return task;              
 }
 
 int main(int argc, char *argv[])
 {
     if (argc < 4)
-    { // acrescentei
+    {
         const char *message = "Usage: ";
         write(STDERR_FILENO, message, strlen(message));
         write(STDERR_FILENO, argv[0], strlen(argv[0]));
@@ -118,14 +118,14 @@ int main(int argc, char *argv[])
     mkfifo(SERVER, 0666);
     int taskid = 1;
     int fd = open(SERVER, O_RDONLY);
-    // acrescentei
+    
     if (fd == -1)
     {
         perror("open");
         exit(EXIT_FAILURE);
     }
     int fd_write = open(SERVER, O_WRONLY);
-    // acrescentei
+    
     if (fd_write == -1)
     {
         perror("open");
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
                 char response_fifo[256];
                 sprintf(response_fifo, CLIENT "%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
-                // acrescentei
+                
                 if (fd_response == -1)
                 {
                     perror("open");
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
                 char response_fifo[256];
                 sprintf(response_fifo, CLIENT "%d", args->pid);
                 int fd_response = open(response_fifo, O_WRONLY);
-                // acrescentei
+                
                 if (fd_response == -1)
                 {
                     perror("open");
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
             int ftask = 0;
             waitpid(args->pid, NULL, 0);
             int fd_out = open(output_file_full, O_WRONLY | O_CREAT, 0666);
-            // acrescentei
+            
             if (fd_out == -1)
             {
                 perror("open");
