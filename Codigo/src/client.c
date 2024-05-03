@@ -6,14 +6,14 @@ int main(int argc, char *argv[])
     pid_t pid = getpid();
     char *fifopath = SERVER;
     if (argc < 2)
-    {   //mudei
+    { // mudei
         perror("Number invalid of arguments");
     }
 
     if (strcmp(argv[1], "execute") == 0)
     {
         char response_fifo[256];
-        sprintf(response_fifo, CLIENT"%d", pid);
+        sprintf(response_fifo, CLIENT "%d", pid);
         if (mkfifo(response_fifo, 0666) == -1)
         {
             perror("mkfifo");
@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         Progam *args = malloc(sizeof(Progam));
+        args->tempo_inicio.microseg = 0;
+        args->tempo_inicio.segundos = 0;
         args->pid = pid;
         args->argc = argc - 3;
         strcpy(args->mode[0], argv[1]);
@@ -61,9 +63,9 @@ int main(int argc, char *argv[])
         char response_fifo_exec[256];
         char response_fifo_sched[256];
         char response_fifo_done[256];
-        sprintf(response_fifo_exec, CLIENT"%d_exec", pid);
-        sprintf(response_fifo_sched, CLIENT"%d_sched", pid);
-        sprintf(response_fifo_done, CLIENT"%d_done", pid);
+        sprintf(response_fifo_exec, CLIENT "%d_exec", pid);
+        sprintf(response_fifo_sched, CLIENT "%d_sched", pid);
+        sprintf(response_fifo_done, CLIENT "%d_done", pid);
         if (mkfifo(response_fifo_exec, 0666) == -1)
         {
             perror("mkfifo");
@@ -92,6 +94,8 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         Progam *args = malloc(sizeof(Progam));
+        args->tempo_inicio.microseg = 0;
+        args->tempo_inicio.segundos = 0;
         args->pid = pid;
         args->argc = 0;
         strcpy(args->mode[0], argv[1]);
@@ -149,7 +153,7 @@ int main(int argc, char *argv[])
             schedprogs_count++;
         }
         free(args);
-        
+
         write(1, "Executing\n", strlen("Executing:\n"));
         for (int i = 0; i < execprogs_count; i++)
         {
@@ -190,6 +194,8 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         Progam *args = malloc(sizeof(Progam));
+        args->tempo_inicio.microseg = 0;
+        args->tempo_inicio.segundos = 0;
         args->pid = pid;
         args->argc = 0;
         strcpy(args->mode[0], argv[1]);

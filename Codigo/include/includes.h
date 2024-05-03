@@ -31,6 +31,7 @@ typedef struct Progam
     int time;
     char command[300];
     long tempo_exec;
+    struct tempo tempo_inicio;
 } Progam;
 
 typedef struct Finished_task

@@ -1,9 +1,9 @@
 #include "includes.h"
 #include "exec_pipes.h"
 
-long exec_pipes(const char *arg, int taskid, char *output_folder)
+long exec_pipes(const char *arg, int taskid, char *output_folder, struct tempo comeco)
 {
-    struct tempo comeco, fim;
+    struct tempo fim;
     long segundos, microseg;
 
     gettimeofday(&comeco, NULL);

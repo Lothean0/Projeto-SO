@@ -3,12 +3,10 @@
 // recebe um comando por argumento
 // retorna -1 se o fork falhar
 // caso contrario retorna o valor do comando executado
-long mysystem(const char *command, int taskid, char *output_folder)
+long mysystem(const char *command, int taskid, char *output_folder, struct tempo comeco)
 {
-	struct tempo comeco, fim;
+	struct tempo fim;
 	long segundos, microseg;
-
-	gettimeofday(&comeco, NULL);
 
 	int res = -1;
 	pid_t pid;

@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
         {
             if (!quit)
             {
+                gettimeofday(&args->tempo_inicio, NULL);
                 args->taskid = taskid++;
                 if (strcmp(sched_policy, "SJF") == 0)
                 {
@@ -180,11 +181,11 @@ int main(int argc, char *argv[])
                         task.pid = getpid();
                         if (strcmp(task.mode[1], "-u") == 0)
                         {
-                            task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                            task.tempo_exec = mysystem(task.command, task.taskid, argv[1],task.tempo_inicio);
                         }
                         else if (strcmp(task.mode[1], "-p") == 0)
                         {
-                            task.tempo_exec = exec_pipes(task.command, task.taskid, argv[1]);
+                            task.tempo_exec = exec_pipes(task.command, task.taskid, argv[1],task.tempo_inicio);
                         }
                         strcpy(task.mode[0], "fork");
                         write(fd_write, &task, sizeof(Progam));
@@ -250,11 +251,11 @@ int main(int argc, char *argv[])
                     task.pid = getpid();
                     if (strcmp(task.mode[1], "-u") == 0)
                     {
-                        task.tempo_exec = mysystem(task.command, task.taskid, argv[1]);
+                        task.tempo_exec = mysystem(task.command, task.taskid, argv[1],task.tempo_inicio);
                     }
                     else if (strcmp(task.mode[1], "-p") == 0)
                     {
-                        task.tempo_exec = exec_pipes(task.command, task.taskid, argv[1]);
+                        task.tempo_exec = exec_pipes(task.command, task.taskid, argv[1],task.tempo_inicio);
                     }
                     strcpy(task.mode[0], "fork");
                     write(fd_write, &task, sizeof(Progam));
