@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     pid_t pid = getpid();
     char *fifopath = SERVER;
     if (argc < 2)
-    { // mudei
+    {   
         perror("Number invalid of arguments");
     }
 

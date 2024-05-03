@@ -27,7 +27,7 @@ typedef struct Progam
     pid_t pid;
     int taskid;
     int argc;
-    char mode[2][8]; // execute or status e -u ou -p
+    char mode[2][8]; 
     int time;
     char command[300];
     long tempo_exec;
