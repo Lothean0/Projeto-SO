@@ -7,7 +7,8 @@ int main(int argc, char *argv[])
     char *fifopath = SERVER;
     if (argc < 2)
     {   
-        perror("Number invalid of arguments");
+        perror("Invalid number of arguments");
+        exit(EXIT_FAILURE);
     }
 
     if (strcmp(argv[1], "execute") == 0)
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
         int fd = open(fifopath, O_WRONLY);
         if (fd == -1)
         {
+            unlink(response_fifo);
             perror("open");
             exit(EXIT_FAILURE);
         }
