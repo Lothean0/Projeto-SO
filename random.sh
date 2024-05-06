@@ -1,8 +1,8 @@
 execute_task(){
 	local task="$1"
-	local teste=$task*100
-	echo "./client execute teste -u "../../Progs_exemplo/hello $task"" >> scripts.txt
-	echo "./client execute teste -u "../../Progs_exemplo/void $task"" >> scripts.txt
+	local tempo=$((task * 100))
+	echo "./client execute $tempo -u "../../Progs_exemplo/hello $task"" >> scripts.txt
+	echo "./client execute $tempo -u "../../Progs_exemplo/void $task"" >> scripts.txt
 }
 
 if [ "$#" -ne 1 ]; then
